@@ -7,11 +7,19 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+// Colors
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_RESET "\x1b[0m"
+#define ANSI_BG_BLACK "\x1b[40m"
+
 // #define LOCALHOST_IP "127.0.0.1\0"
 // #define DEFAULT_PORT 3000
 // #define MINIMUM_PORT 3000
 // #define MAXIMUM_PORT 10000
 #define PORT_BASE 10
+#define CLOSE_CONNECTION_KEYWORD "exit"
+#define DEFAULT_BUFFER_SIZE 1024
+#define NUM_ARGS 3
 
 /**
  * @brief displays the usage of this app.
@@ -24,6 +32,21 @@ void display_usage(void);
  * @param port the port to connect to
  */
 int socket_connect_to(const char *ip, uint16_t port);
+
+/**
+ * @brief Sends the size of the message to the server.
+ * @param message_size the size of the message in bytes
+ *
+ */
+int send_message_size(int client_fd, size_t message_size);
+
+/**
+ * @brief Sends the message to the server.
+ * @param client_fd the client file descriptor
+ * @param buffer the buffer containing the message
+ * @param message_size the size of the message
+ */
+int send_message(int client_fd, const char *buffer, size_t message_size);
 
 /**
  * @brief converts a port from char to uint16_t
@@ -40,7 +63,7 @@ int main(int argc, char *argv[])
     arguments.argc = argc;
     arguments.argv = argv;
 
-    if(arguments.argc < 3)
+    if(arguments.argc < NUM_ARGS)
     {
         display_usage();
         return EXIT_FAILURE;
@@ -78,6 +101,7 @@ void display_usage(void)
 int socket_connect_to(const char *ip, uint16_t port)
 {
     int                sockfd;    // The client socket.
+    char               buffer[DEFAULT_BUFFER_SIZE];
     struct sockaddr_in serveraddr;
 
     if(!ip)
@@ -122,6 +146,36 @@ int socket_connect_to(const char *ip, uint16_t port)
            "\n",
            ip,
            port);
+
+    // Write to the socket.
+    while(1)
+    {
+        size_t buffer_size;
+
+        printf(ANSI_BG_BLACK ANSI_COLOR_GREEN "> " ANSI_COLOR_RESET);
+        fgets(buffer, sizeof(buffer), stdin);
+
+        // Remove newline character
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        buffer_size = strlen(buffer);
+
+        // Send message size to the server.
+        send_message_size(sockfd, buffer_size);
+
+        // Send the message
+        send_message(sockfd, buffer, buffer_size);
+
+        // Check for exit
+        if(strcmp(buffer, CLOSE_CONNECTION_KEYWORD) == 0)
+        {
+            printf("Exiting...\n");
+            break;
+        }
+    }
+
+    close(sockfd);
+
     return EXIT_SUCCESS;
 }
 
@@ -148,4 +202,32 @@ uint16_t convert_port(const char *portStr)
     }
 
     return (uint16_t)portUlong;
+}
+
+int send_message_size(int client_fd, size_t message_size)
+{
+    if(send(client_fd, &message_size, sizeof(size_t), 0) == -1)
+    {
+        fprintf(stderr, "send() failed\n");
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int send_message(int client_fd, const char *buffer, size_t message_size)
+{
+    if(buffer == NULL)
+    {
+        fprintf(stderr, "buffer is null\n");
+        return EXIT_FAILURE;
+    }
+
+    if(send(client_fd, buffer, message_size, 0) == -1)
+    {
+        fprintf(stderr, "send() failed\n");
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
