@@ -24,7 +24,7 @@
 #define NUM_ARGS 3
 
 /**
- * @brief displays the usage of this app.
+ * @brief Displays the usage of this app.
  */
 void display_usage(void);
 
@@ -43,6 +43,11 @@ int send_message_size(int client_fd, size_t message_size);
  */
 int send_message(int client_fd, const char *buffer, size_t message_size);
 
+/**
+ * @brief Connects the client to a given domain.
+ * @param ip the ip to connect to
+ * @param port the port to connect to
+ */
 int socket_connect_to(const char *ip, uint16_t port);
 
 int main(int argc, char *argv[])
