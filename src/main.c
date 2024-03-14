@@ -7,6 +7,9 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+// My libraries
+#include "serverTools.h"
+
 // Colors
 #define ANSI_COLOR_GREEN "\x1b[32m"
 #define ANSI_COLOR_RESET "\x1b[0m"
@@ -16,7 +19,6 @@
 // #define DEFAULT_PORT 3000
 // #define MINIMUM_PORT 3000
 // #define MAXIMUM_PORT 10000
-#define PORT_BASE 10
 #define CLOSE_CONNECTION_KEYWORD "exit"
 #define DEFAULT_BUFFER_SIZE 1024
 #define NUM_ARGS 3
@@ -25,13 +27,6 @@
  * @brief displays the usage of this app.
  */
 void display_usage(void);
-
-/**
- * @brief Creates a socket connection to the given address.
- * @param ip the ip to connect to
- * @param port the port to connect to
- */
-int socket_connect_to(const char *ip, uint16_t port);
 
 /**
  * @brief Sends the size of the message to the server.
@@ -48,11 +43,7 @@ int send_message_size(int client_fd, size_t message_size);
  */
 int send_message(int client_fd, const char *buffer, size_t message_size);
 
-/**
- * @brief converts a port from char to uint16_t
- * @param portStr the port string
- */
-uint16_t convert_port(const char *portStr);
+int socket_connect_to(const char *ip, uint16_t port);
 
 int main(int argc, char *argv[])
 {
@@ -177,31 +168,6 @@ int socket_connect_to(const char *ip, uint16_t port)
     close(sockfd);
 
     return EXIT_SUCCESS;
-}
-
-uint16_t convert_port(const char *portStr)
-{
-    char         *endptr;
-    unsigned long portUlong;
-
-    portUlong = strtoul(portStr,
-                        &endptr,
-                        PORT_BASE    // Base 10
-    );
-
-    if(*endptr != '\0')
-    {
-        fprintf(stderr, "Error: Invalid port number format.\n");
-        return EXIT_FAILURE;
-    }
-
-    if(portUlong == UINT16_MAX)
-    {
-        fprintf(stderr, "Error: Port number out of range.\n");
-        return EXIT_FAILURE;
-    }
-
-    return (uint16_t)portUlong;
 }
 
 int send_message_size(int client_fd, size_t message_size)
