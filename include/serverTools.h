@@ -11,6 +11,16 @@
 uint16_t convert_port(const char *port_str);
 
 /**
+ * @brief Sends a message to a socket.
+ * First sends the message size
+ * then sends the message content
+ *
+ * @param client_fd the client socket to send to
+ * @param buffer the buffer containing the message
+ */
+int send_message(int client_fd, char *buffer);
+
+/**
  * @brief Sends the size of the message to the server.
  * @param message_size the size of the message in bytes
  *
@@ -18,11 +28,11 @@ uint16_t convert_port(const char *port_str);
 int send_message_size(int client_fd, size_t message_size);
 
 /**
- * @brief Sends the message to the server.
+ * @brief Sends the message content to the server.
  * @param client_fd the client file descriptor
  * @param buffer the buffer containing the message
  * @param message_size the size of the message
  */
-int send_message(int client_fd, const char *buffer, size_t message_size);
+int send_message_content(int client_fd, const char *buffer, size_t message_size);
 
 #endif

@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define PORT_BASE 10
 
@@ -47,7 +48,7 @@ int send_message_size(int client_fd, size_t message_size)
     return EXIT_SUCCESS;
 }
 
-int send_message(int client_fd, const char *buffer, size_t message_size)
+int send_message_content(int client_fd, const char *buffer, size_t message_size)
 {
     if(buffer == NULL)
     {
@@ -60,6 +61,30 @@ int send_message(int client_fd, const char *buffer, size_t message_size)
         fprintf(stderr, "send() failed\n");
         return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
+}
+
+int send_message(int client_fd, char *buffer)
+{
+    size_t buffer_size;
+
+    // Remove the newline
+    buffer[strcspn(buffer, "\n")] = '\0';
+
+    buffer_size = strlen(buffer);
+
+    // If the buffer size is 0, do not send.
+    if(buffer_size == 0)
+    {
+        return EXIT_FAILURE;
+    }
+
+    // Send the message size to the server
+    send_message_size(client_fd, buffer_size);
+
+    // Send the message content to the server
+    send_message_content(client_fd, buffer, buffer_size);
 
     return EXIT_SUCCESS;
 }

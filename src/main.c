@@ -131,21 +131,20 @@ int socket_connect_to(const char *ip, uint16_t port)
     // Write to the socket.
     while(1)
     {
-        size_t buffer_size;
+        int send_result;
 
         printf(ANSI_BG_BLACK ANSI_COLOR_GREEN "> " ANSI_COLOR_RESET);
+
         fgets(buffer, sizeof(buffer), stdin);
 
-        // Remove newline character
-        buffer[strcspn(buffer, "\n")] = '\0';
+        // Send the message to the server
+        send_result = send_message(sockfd, buffer);
 
-        buffer_size = strlen(buffer);
-
-        // Send message size to the server.
-        send_message_size(sockfd, buffer_size);
-
-        // Send the message
-        send_message(sockfd, buffer, buffer_size);
+        // If send encountered an error, continue
+        if(send_result == EXIT_FAILURE)
+        {
+            continue;
+        }
 
         // Check for exit
         if(strcmp(buffer, CLOSE_CONNECTION_KEYWORD) == 0)
