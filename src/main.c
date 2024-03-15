@@ -29,21 +29,6 @@
 void display_usage(void);
 
 /**
- * @brief Sends the size of the message to the server.
- * @param message_size the size of the message in bytes
- *
- */
-int send_message_size(int client_fd, size_t message_size);
-
-/**
- * @brief Sends the message to the server.
- * @param client_fd the client file descriptor
- * @param buffer the buffer containing the message
- * @param message_size the size of the message
- */
-int send_message(int client_fd, const char *buffer, size_t message_size);
-
-/**
  * @brief Connects the client to a given domain.
  * @param ip the ip to connect to
  * @param port the port to connect to
@@ -171,34 +156,6 @@ int socket_connect_to(const char *ip, uint16_t port)
     }
 
     close(sockfd);
-
-    return EXIT_SUCCESS;
-}
-
-int send_message_size(int client_fd, size_t message_size)
-{
-    if(send(client_fd, &message_size, sizeof(size_t), 0) == -1)
-    {
-        fprintf(stderr, "send() failed\n");
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-int send_message(int client_fd, const char *buffer, size_t message_size)
-{
-    if(buffer == NULL)
-    {
-        fprintf(stderr, "buffer is null\n");
-        return EXIT_FAILURE;
-    }
-
-    if(send(client_fd, buffer, message_size, 0) == -1)
-    {
-        fprintf(stderr, "send() failed\n");
-        return EXIT_FAILURE;
-    }
 
     return EXIT_SUCCESS;
 }
