@@ -50,20 +50,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // Goal: Create a remote shell app.
-    // Create a server that is able to accept multiple clients.
-    // The clients should be able to run commands through the server.
-    // It should read and execute the commands from the client socket
-    // dup2 -> redirects the stdout to the socket
-    // use execv();
-    // "Confirm that it exists" using access();
-
-    // On the client side:
-    // You don't need much to the client because it's just writing the commands
-    // to the server and awaiting a response.
-
-    // Make sure to go through D'Arcy's examples on Google Drive.
-
     ip   = arguments.argv[1];
     port = convert_port(arguments.argv[2]);
 
@@ -131,11 +117,20 @@ int socket_connect_to(const char *ip, uint16_t port)
     // Write to the socket.
     while(1)
     {
-        int send_result;
+        char   *message      = NULL;
+        ssize_t message_size = 0;
+        int     send_result;
 
         printf(ANSI_BG_BLACK ANSI_COLOR_GREEN "> " ANSI_COLOR_RESET);
 
         fgets(buffer, sizeof(buffer), stdin);
+
+        // Check for exit
+        if(strcmp(buffer, CLOSE_CONNECTION_KEYWORD) == 0)
+        {
+            printf("Exiting...\n");
+            break;
+        }
 
         // Send the message to the server
         send_result = send_message(sockfd, buffer);
@@ -146,12 +141,14 @@ int socket_connect_to(const char *ip, uint16_t port)
             continue;
         }
 
-        // Check for exit
-        if(strcmp(buffer, CLOSE_CONNECTION_KEYWORD) == 0)
+        // Receive the server response
+        if(receive_message(sockfd, &message, message_size) == EXIT_FAILURE)
         {
-            printf("Exiting...\n");
-            break;
+            fprintf(stderr, "receive_message() failed\n");
+            return EXIT_FAILURE;
         }
+
+        printf("Received: %s\n", message);
     }
 
     close(sockfd);

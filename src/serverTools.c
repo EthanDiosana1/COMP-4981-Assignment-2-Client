@@ -88,3 +88,53 @@ int send_message(int client_fd, char *buffer)
 
     return EXIT_SUCCESS;
 }
+
+int receive_message(int client_fd, char **message, ssize_t message_size)
+{
+    ssize_t bytes_received;
+
+    // Receive the message size
+    bytes_received = recv(client_fd, &message_size, sizeof(ssize_t), 0);
+    if(bytes_received <= 0)
+    {
+        // Handle client disconnect
+        if(bytes_received == 0)
+        {
+            printf("Client disconnected.\n");
+        }
+        else
+        {
+            fprintf(stderr, "recv() failed\n");
+        }
+    }
+
+    // Allocate memory for message buffer
+    *message = malloc((size_t)(message_size) + 1);
+
+    if(*message == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory for message.\n");
+        return EXIT_FAILURE;
+    }
+
+    // Receive message from client.
+    bytes_received = recv(client_fd, *message, (size_t)message_size, 0);
+    if(bytes_received <= 0)
+    {
+        if(bytes_received == 0)
+        {
+            printf("Client disconnected.\n");
+        }
+        else
+        {
+            fprintf(stderr, "recv() failed\n");
+        }
+        free(*message);
+        return EXIT_FAILURE;
+    }
+
+    // Add null terminator to message
+    (*message)[bytes_received] = '\0';
+
+    return EXIT_SUCCESS;
+}

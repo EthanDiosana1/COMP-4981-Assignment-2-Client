@@ -35,4 +35,12 @@ int send_message_size(int client_fd, size_t message_size);
  */
 int send_message_content(int client_fd, const char *buffer, size_t message_size);
 
+/**
+ * @brief Receives a message from the client.
+ * @param client_fd the file descriptor of the client socket
+ * @param message the message buffer
+ * @param message_size the expected size of the message
+ */
+int receive_message(int client_fd, char **message, ssize_t message_size);
+
 #endif
