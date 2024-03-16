@@ -15,10 +15,8 @@
 #define ANSI_COLOR_RESET "\x1b[0m"
 #define ANSI_BG_BLACK "\x1b[40m"
 
-// #define LOCALHOST_IP "127.0.0.1\0"
-// #define DEFAULT_PORT 3000
-// #define MINIMUM_PORT 3000
-// #define MAXIMUM_PORT 10000
+#define MIN_PORT 3000
+#define MAX_PORT 10000
 #define CLOSE_CONNECTION_KEYWORD "exit"
 #define DEFAULT_BUFFER_SIZE 1024
 #define NUM_ARGS 3
@@ -52,6 +50,13 @@ int main(int argc, char *argv[])
 
     ip   = arguments.argv[1];
     port = convert_port(arguments.argv[2]);
+
+    // If the port is less than the min...
+    if(port < MIN_PORT || port > MAX_PORT)
+    {
+        fprintf(stderr, "port must be between 3000 and 10000 inclusive.\n");
+        return EXIT_FAILURE;
+    }
 
     printf("Client options: ip: %s, port: %hu\n", ip, port);
 
