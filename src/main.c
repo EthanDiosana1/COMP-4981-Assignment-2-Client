@@ -1,9 +1,8 @@
-#include "arguments.h"
 #include <arpa/inet.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stringTools.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -35,21 +34,17 @@ int socket_connect_to(const char *ip, uint16_t port);
 
 int main(int argc, char *argv[])
 {
-    struct arguments arguments;    // Holds the arguments info.
-    uint16_t         port;         // the port to connect to.
-    const char      *ip;           // the IP to connect to.
+    uint16_t    port;    // the port to connect to.
+    const char *ip;      // the IP to connect to.
 
-    arguments.argc = argc;
-    arguments.argv = argv;
-
-    if(arguments.argc < NUM_ARGS)
+    if(argc < NUM_ARGS)
     {
         display_usage();
         return EXIT_FAILURE;
     }
 
-    ip   = arguments.argv[1];
-    port = convert_port(arguments.argv[2]);
+    ip   = argv[1];
+    port = convert_port(argv[2]);
 
     // If the port is less than the min...
     if(port < MIN_PORT || port > MAX_PORT)
