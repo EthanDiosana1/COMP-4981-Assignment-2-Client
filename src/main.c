@@ -98,7 +98,7 @@ int socket_connect_to(const char *ip, uint16_t port)
 
     // Assign IP, port.
     serveraddr.sin_family      = AF_INET;
-    serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serveraddr.sin_addr.s_addr = inet_addr(ip);
     serveraddr.sin_port        = htons(port);
 
     if(connect(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) != 0)
