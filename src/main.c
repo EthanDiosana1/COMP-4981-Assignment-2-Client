@@ -145,7 +145,7 @@ int socket_connect_to(const char *ip, uint16_t port)
         if(receive_message(sockfd, &message, message_size) == EXIT_FAILURE)
         {
             fprintf(stderr, "receive_message() failed\n");
-            return EXIT_FAILURE;
+            continue;
         }
 
         printf("Received: %s\n", message);
