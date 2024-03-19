@@ -138,6 +138,7 @@ int socket_connect_to(const char *ip, uint16_t port)
         // If send encountered an error, continue
         if(send_result == EXIT_FAILURE)
         {
+            close(sockfd);
             continue;
         }
 
@@ -145,6 +146,7 @@ int socket_connect_to(const char *ip, uint16_t port)
         if(receive_message(sockfd, &message, message_size) == EXIT_FAILURE)
         {
             fprintf(stderr, "receive_message() failed\n");
+            close(sockfd);
             continue;
         }
 
