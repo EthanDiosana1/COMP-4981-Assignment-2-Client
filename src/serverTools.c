@@ -139,12 +139,14 @@ int receive_message(int client_fd, char **message, ssize_t message_size)
         // Handle client disconnect
         if(bytes_received == 0)
         {
-            printf("Client disconnected.\n");
+            printf("No output received from server.\n");
         }
         else
         {
             fprintf(stderr, "recv() failed\n");
         }
+        free(*message);
+        return EXIT_SUCCESS;
     }
 
     // Allocate memory for message buffer
