@@ -46,10 +46,19 @@ int main(int argc, char *argv[])
     ip   = argv[1];
     port = convert_port(argv[2]);
 
+    // If the ip is not a valid ip...
+    if(!is_valid_ip(ip))
+    {
+        fprintf(stderr, "invalid IPv4 address: %s\n", ip);
+        display_usage();
+        return EXIT_FAILURE;
+    }
+
     // If the port is less than the min...
     if(port < MIN_PORT || port > MAX_PORT)
     {
         fprintf(stderr, "port must be between 3000 and 10000 inclusive.\n");
+        display_usage();
         return EXIT_FAILURE;
     }
 
